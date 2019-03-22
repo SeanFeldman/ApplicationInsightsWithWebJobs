@@ -37,6 +37,10 @@ namespace AppInsightsWithWebJob
             var host = builder.Build();
             var cancellationToken = new WebJobsShutdownWatcher().Token;
 
+            var telemetryClient = host.Services.GetService<TelemetryClient>();
+            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.ExceptionObject);
+            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.Exception);
+
             using (cancellationToken.Register(() => host.Services.GetService<IJobHost>().StopAsync().GetAwaiter().GetResult()))
             using (host)
             {
