@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AppInsightsWithWebJob
 {
-    public class ContinuousJob : IHostedService
+    public class ContinuousJob : BackgroundService
     {
         private readonly ILogger<ContinuousJob> logger;
 
@@ -15,13 +15,13 @@ namespace AppInsightsWithWebJob
             this.logger = logger;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var counter = 0;
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 Console.Write(".");
-                await Task.Delay(100, cancellationToken);
+                await Task.Delay(100, stoppingToken);
 
                 if (counter++ > 20)
                 {
@@ -29,11 +29,6 @@ namespace AppInsightsWithWebJob
                     throw new InvalidOperationException("oy vay!");
                 }
             }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
     }
 }

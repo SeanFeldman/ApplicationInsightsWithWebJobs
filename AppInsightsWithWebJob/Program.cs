@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace AppInsightsWithWebJob
 {
+    using System.Threading;
+
     class Program
     {
         static async Task Main(string[] args)
@@ -37,14 +38,13 @@ namespace AppInsightsWithWebJob
             var host = builder.Build();
             var cancellationToken = new WebJobsShutdownWatcher().Token;
 
-            var telemetryClient = host.Services.GetService<TelemetryClient>();
-            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.ExceptionObject);
-            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.Exception);
+//            var telemetryClient = host.Services.GetService<TelemetryClient>();
+//            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.ExceptionObject);
+//            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.Exception);
 
-            using (cancellationToken.Register(() => host.Services.GetService<IJobHost>().StopAsync().GetAwaiter().GetResult()))
             using (host)
             {
-                await host.RunAsync(cancellationToken);
+                await host.RunAsync(default(CancellationToken));
             }
         }
     }
