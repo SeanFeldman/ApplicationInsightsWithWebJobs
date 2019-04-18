@@ -1,15 +1,12 @@
-﻿using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace AppInsightsWithWebJob
+﻿namespace AppInsightsWithWebJob
 {
     using System;
-    using System.Threading;
     using Microsoft.ApplicationInsights;
+    using System.Threading.Tasks;
+    using Microsoft.ApplicationInsights.Extensibility;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
 
     class Program
     {

@@ -1,33 +1,44 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace AppInsightsWithWebJob
+﻿namespace AppInsightsWithWebJob
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+
+    using Microsoft.ApplicationInsights;
+
     public class ContinuousJob : BackgroundService
     {
-        private readonly ILogger<ContinuousJob> logger;
+        readonly ILogger<ContinuousJob> logger;
+        readonly TelemetryClient telemetryClient;
 
-        public ContinuousJob(ILogger<ContinuousJob> logger)
+        public ContinuousJob(ILogger<ContinuousJob> logger, TelemetryClient telemetryClient)
         {
             this.logger = logger;
+            this.telemetryClient = telemetryClient;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var counter = 0;
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                Console.Write(".");
-                await Task.Delay(100, stoppingToken);
-
-                if (counter++ > 20)
+                var counter = 0;
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    logger.LogInformation("!!! About to throw !!!");
-                    throw new InvalidOperationException("oy vay!");
+                    Console.Write(".");
+                    await Task.Delay(100, stoppingToken);
+
+                    if (counter++ > 20)
+                    {
+                        logger.LogInformation("!!! About to throw !!!");
+                        throw new InvalidOperationException("oy vay!");
+                    }
                 }
+            }
+            catch (Exception exception)
+            {
+                telemetryClient.TrackException(exception);
             }
         }
     }
