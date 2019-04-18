@@ -38,6 +38,7 @@
             }
             catch (Exception exception)
             {
+                logger.LogCritical(exception, "Continuous job threw an exceptions.");
                 telemetryClient.TrackException(exception);
             }
         }
