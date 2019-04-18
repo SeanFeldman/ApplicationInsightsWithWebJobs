@@ -7,7 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AppInsightsWithWebJob
 {
+    using System;
     using System.Threading;
+    using Microsoft.ApplicationInsights;
 
     class Program
     {
@@ -36,15 +38,16 @@ namespace AppInsightsWithWebJob
             });
 
             var host = builder.Build();
-            var cancellationToken = new WebJobsShutdownWatcher().Token;
 
-//            var telemetryClient = host.Services.GetService<TelemetryClient>();
-//            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.ExceptionObject);
-//            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => telemetryClient.TrackException((Exception)eventArgs.Exception);
+            var telemetryClient = host.Services.GetService<TelemetryClient>();
 
-            using (host)
+            try
             {
-                await host.RunAsync(default(CancellationToken));
+                await host.RunAsync();
+            }
+            catch (Exception exception)
+            {
+                telemetryClient.TrackException(exception);
             }
         }
     }
