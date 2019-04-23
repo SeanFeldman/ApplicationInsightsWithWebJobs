@@ -24,7 +24,9 @@
                 b.AddConsole();
                 b.AddApplicationInsights(options =>
                 {
-                    options.InstrumentationKey = "x";
+                    var instrumentationKey = context.Configuration["AppInsightsInstrumentationKey"];
+                    Console.WriteLine($"Instrumentation key: {instrumentationKey}");
+                    options.InstrumentationKey = instrumentationKey;
                 });
             });
 
