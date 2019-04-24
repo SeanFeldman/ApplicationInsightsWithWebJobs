@@ -31,6 +31,7 @@
                 logger.LogCritical("[JOB] Continuous job threw an exceptions. {0}", exception);
                 telemetryClient.TrackException(exception);
 
+                await Task.Delay(5_000); // delay to allow telemetry to be written out.
                 Environment.FailFast("Shutting down webjob due to a critical error.");
             }
         }
