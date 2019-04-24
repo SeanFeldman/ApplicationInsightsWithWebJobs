@@ -1,4 +1,6 @@
-﻿namespace AppInsightsWithWebJob
+﻿using Microsoft.ApplicationInsights;
+
+namespace AppInsightsWithWebJob
 {
     using System;
     using System.Threading.Tasks;
@@ -37,7 +39,17 @@
             });
 
             var host = builder.Build();
-            await host.RunAsync();
+
+            try
+            {
+                await host.RunAsync();
+            }
+            catch (Exception exception)
+            {
+                host.Services.GetService<ILogger<Program>>().LogCritical("[PROG] Continuous job threw an exceptions. {0}", exception);
+                host.Services.GetService<TelemetryClient>().TrackException(exception);
+                throw;
+            }
         }
     }
 }
