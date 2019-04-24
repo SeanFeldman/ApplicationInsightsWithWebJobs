@@ -21,6 +21,7 @@
 
             builder.ConfigureLogging((context, b) =>
             {
+                b.SetMinimumLevel(LogLevel.Debug);
                 b.AddConsole();
                 b.AddApplicationInsights(options =>
                 {
