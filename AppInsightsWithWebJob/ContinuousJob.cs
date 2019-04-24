@@ -21,24 +21,26 @@
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            logger.LogInformation("executing WebJob");
             try
             {
                 var counter = 0;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     Console.Write(".");
-                    await Task.Delay(100, stoppingToken);
+                    await Task.Delay(150, stoppingToken);
+                    logger.LogDebug($"Counter is at {counter}", counter);
 
-                    if (counter++ > 20)
+                    if (counter++ > 10)
                     {
-                        logger.LogInformation("!!! About to throw !!!");
+                        logger.LogWarning(">> About to throw <<");
                         throw new InvalidOperationException("oy vay!");
                     }
                 }
             }
             catch (Exception exception)
             {
-                logger.LogCritical(exception, "Continuous job threw an exceptions.");
+                logger.LogCritical("[JOB] Continuous job threw an exceptions. {0}", exception);
                 telemetryClient.TrackException(exception);
             }
         }

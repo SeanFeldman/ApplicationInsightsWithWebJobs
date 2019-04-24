@@ -1,7 +1,6 @@
 ﻿namespace AppInsightsWithWebJob
 {
     using System;
-    using Microsoft.ApplicationInsights;
     using System.Threading.Tasks;
     using Microsoft.ApplicationInsights.Extensibility;
     using Microsoft.Extensions.DependencyInjection;
@@ -38,17 +37,7 @@
             });
 
             var host = builder.Build();
-
-            var telemetryClient = host.Services.GetService<TelemetryClient>();
-
-            try
-            {
-                await host.RunAsync();
-            }
-            catch (Exception exception)
-            {
-                telemetryClient.TrackException(exception);
-            }
+            await host.RunAsync();
         }
     }
 }
