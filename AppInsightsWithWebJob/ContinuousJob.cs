@@ -30,10 +30,14 @@
             {
                 logger.LogCritical("[JOB] Continuous job threw an exceptions. {0}", exception);
                 telemetryClient.TrackException(exception);
-
-                await Task.Delay(5_000); // delay to allow telemetry to be written out.
-                Environment.FailFast("Shutting down webjob due to a critical error.");
             }
+        }
+
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            logger.LogDebug("StopAsync called");
+
+            return base.StopAsync(cancellationToken);
         }
 
         private async Task Process(CancellationToken stoppingToken)
