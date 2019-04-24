@@ -1,6 +1,4 @@
-﻿using Microsoft.ApplicationInsights;
-
-namespace AppInsightsWithWebJob
+﻿namespace AppInsightsWithWebJob
 {
     using System;
     using System.Threading.Tasks;
@@ -38,18 +36,7 @@ namespace AppInsightsWithWebJob
                 services.AddSingleton<IHostedService, ContinuousJob>();
             });
 
-            var host = builder.Build();
-
-            try
-            {
-                await host.RunAsync();
-            }
-            catch (Exception exception)
-            {
-                host.Services.GetService<ILogger<Program>>().LogCritical("[PROG] Continuous job threw an exceptions. {0}", exception);
-                host.Services.GetService<TelemetryClient>().TrackException(exception);
-                throw;
-            }
+            await builder.Build().RunAsync();
         }
     }
 }

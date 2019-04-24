@@ -24,26 +24,31 @@
             logger.LogInformation("executing WebJob");
             try
             {
-                var counter = 0;
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    Console.Write(".");
-                    await Task.Delay(150, stoppingToken);
-                    logger.LogDebug($"Counter is at {counter}", counter);
-
-                    if (counter++ > 10)
-                    {
-                        logger.LogWarning(">> About to throw <<");
-                        throw new InvalidOperationException("oy vay!");
-                    }
-                }
+                await Process(stoppingToken);
             }
             catch (Exception exception)
             {
                 logger.LogCritical("[JOB] Continuous job threw an exceptions. {0}", exception);
                 telemetryClient.TrackException(exception);
 
-                throw;
+                Environment.FailFast("Shutting down webjob due to a critical error.");
+            }
+        }
+
+        private async Task Process(CancellationToken stoppingToken)
+        {
+            var counter = 0;
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                Console.Write(".");
+                await Task.Delay(150, stoppingToken);
+                logger.LogDebug($"Counter is at {counter}", counter);
+
+                if (counter++ > 10)
+                {
+                    logger.LogWarning(">> About to throw <<");
+                    throw new InvalidOperationException("oy vay!");
+                }
             }
         }
     }
