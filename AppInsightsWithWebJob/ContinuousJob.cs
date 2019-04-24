@@ -42,6 +42,7 @@
             {
                 logger.LogCritical("[JOB] Continuous job threw an exceptions. {0}", exception);
                 telemetryClient.TrackException(exception);
+                await Task.Delay(2_000); // allow AppInsights to send the data???
             }
         }
     }
