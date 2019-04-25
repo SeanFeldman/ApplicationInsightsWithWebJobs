@@ -1,39 +1,60 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace AppInsightsWithWebJob
+﻿namespace AppInsightsWithWebJob
 {
-    public class ContinuousJob : IHostedService
-    {
-        private readonly ILogger<ContinuousJob> logger;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
 
-        public ContinuousJob(ILogger<ContinuousJob> logger)
+    using Microsoft.ApplicationInsights;
+
+    public class ContinuousJob : BackgroundService
+    {
+        readonly ILogger<ContinuousJob> logger;
+        readonly TelemetryClient telemetryClient;
+
+        public ContinuousJob(ILogger<ContinuousJob> logger, TelemetryClient telemetryClient)
         {
             this.logger = logger;
+            this.telemetryClient = telemetryClient;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var counter = 0;
-            while (!cancellationToken.IsCancellationRequested)
+            logger.LogInformation("executing WebJob");
+            try
             {
-                Console.Write(".");
-                await Task.Delay(100, cancellationToken);
-
-                if (counter++ > 20)
-                {
-                    logger.LogInformation("!!! About to throw !!!");
-                    throw new InvalidOperationException("oy vay!");
-                }
+                await Process(stoppingToken);
+            }
+            catch (Exception exception)
+            {
+                logger.LogCritical("[JOB] Continuous job threw an exceptions. {0}", exception);
+                telemetryClient.TrackException(exception);
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public override Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            logger.LogDebug("StopAsync called");
+
+            return base.StopAsync(cancellationToken);
+        }
+
+        private async Task Process(CancellationToken stoppingToken)
+        {
+            var counter = 0;
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                Console.Write(".");
+                await Task.Delay(150, stoppingToken);
+                logger.LogDebug($"Counter is at {counter}", counter);
+
+                if (counter++ > 10)
+                {
+                    logger.LogWarning(">> About to throw <<");
+                    throw new InvalidOperationException("oy vay!");
+                }
+            }
         }
     }
 }
