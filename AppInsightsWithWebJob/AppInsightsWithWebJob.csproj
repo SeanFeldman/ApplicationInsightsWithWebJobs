@@ -19,6 +19,11 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Logging.ApplicationInsights" Version="3.0.5" />
   </ItemGroup>
 
+  <ItemGroup Label="Force the latest version of the transient dependency for Microsoft.ApplicationInsights and Microsoft.Azure.WebJobs.Logging.ApplicationInsights. Remove when stable version is out">
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.10.0-beta3" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel" Version="2.10.0-beta3" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
